@@ -1,0 +1,26 @@
+aiohttp==3.5.4
+graphene==2.1.5
+aiohttp-graphql==1.0.0
+
+async-timeout==3.0.1  # aiohttp
+attrs==19.1.0  # aiohttp
+chardet==3.0.4  # aiohttp
+idna==2.8  # aiohttp
+multidict==4.5.2  # aiohttp
+yarl==1.3.0  # aiohttp
+
+aniso8601==5.1.0  # graphene
+graphql-core==2.2  # graphene
+graphql-relay==0.4.5  # graphene
+promise==2.2.1  # graphene
+python-dateutil==2.8.0  # graphene
+relativetimebuilder==1.0.0  # graphene
+rx==1.6.1  # graphene
+six==1.12.0  # graphene
+
+graphql-core==2.2  # aiohttp-graphql
+graphql-server-core==1.1.1  # aiohttp-graphql
+promise==2.2.1  # aiohttp-graphql
+pytest-runner==5.1  # aiohttp-graphql
+rx==1.6.1  # aiohttp-graphql
+six==1.12.0  # aiohttp-graphql

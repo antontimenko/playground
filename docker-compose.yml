@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+
+  py-base: &py-base
+    build:
+      context: .
+      dockerfile: docker/py.docker
+    volumes:
+      - .:/work
+
+  js-base: &js-base
+    build:
+      context: .
+      dockerfile: docker/js.docker
+    volumes:
+      - .:/work
+      - node_modules:/work/node_modules
+
+  nginx:
+    image: nginx:1.17-alpine
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/conf.d/nginx.conf
+    ports:
+      - "8000:8000"
+
+  api:
+    <<: *py-base
+    command: watchexec -e py -r -- python -m playground
+
+  frontend:
+    <<: *js-base
+    command: yarn start
+    ports:
+      - "8001:8001"
+
+  ssr:
+    <<: *js-base
+    command: yarn ssr
+
+  pip:
+    <<: *py-base
+    entrypoint: ['pip']
+
+  yarn:
+    <<: *js-base
+    entrypoint: ['yarn']
+
+volumes:
+  node_modules:

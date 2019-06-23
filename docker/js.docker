@@ -1,0 +1,11 @@
+FROM node:12.3-alpine
+
+RUN npm install -g yarn
+
+RUN mkdir /work
+WORKDIR /work
+
+ENV NODE_PATH=playground/js:node_modules
+
+COPY package.json yarn.lock ./
+RUN yarn
