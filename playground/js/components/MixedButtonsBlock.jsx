@@ -22,7 +22,7 @@ const ButtonBase = ({ prefix, loading, error, data, getText, onClick }) => {
 
 ButtonBase.propTypes = {
     prefix: PropTypes.string.isRequired,
-    loading: PropTypes.bool.isRequired,
+    loading: PropTypes.bool,
     error: PropTypes.any,
     data: PropTypes.any,
     getText: PropTypes.func.isRequired,
@@ -30,6 +30,7 @@ ButtonBase.propTypes = {
 };
 
 ButtonBase.defaultProps = {
+    loading: false,
     error: null,
     data: null,
 };

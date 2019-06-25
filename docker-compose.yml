@@ -26,7 +26,7 @@ services:
 
   api:
     <<: *py-base
-    command: watchexec -e py -r -- python -m playground
+    command: gunicorn --bind 0.0.0.0:8002 --reload --worker-class aiohttp.worker.GunicornWebWorker playground.app:app
 
   frontend:
     <<: *js-base

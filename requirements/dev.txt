@@ -1,5 +1,6 @@
 -r base.txt
 
+gunicorn==19.9.0
 flake8==3.7.7
 flake8-import-order==0.18.1
 mypy==0.711

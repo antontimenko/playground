@@ -26,13 +26,14 @@ const GraphQLButtonBase = ({ loading, error, data, onClick }) => {
 };
 
 GraphQLButtonBase.propTypes = {
-    loading: PropTypes.bool.isRequired,
+    loading: PropTypes.bool,
     error: PropTypes.any,
     data: PropTypes.any,
     onClick: PropTypes.func.isRequired,
 };
 
 GraphQLButtonBase.defaultProps = {
+    loading: false,
     error: null,
     data: null,
 };
@@ -175,7 +176,7 @@ const GraphQLButtonsBlock = () => (
         </p>
         <p>
             Manual button:
-            <GraphQLButtonManual options={{ variables: { attr: 'manual' } }} />
+            <GraphQLButtonManual attr='manual' />
         </p>
         <p>
             Chain SSR (with cache):
