@@ -1,0 +1,13 @@
+-r base.txt
+
+flake8==3.7.7
+flake8-import-order==0.18.1
+mypy==0.711
+
+entrypoints==0.3  # flake8
+mccabe==0.6.1  # flake8
+pycodestyle==2.5.0  # flake8
+pyflakes==2.1.1  # flake8
+
+mypy-extensions==0.4.1  # mypy
+typed-ast==1.4.0  # mypy

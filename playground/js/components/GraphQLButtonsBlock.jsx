@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useQuery, useManualQuery } from 'graphql-hooks';
 
 const RANDOM_TEXT_QUERY = `
@@ -22,10 +23,25 @@ const GraphQLButtonBase = ({ loading, error, data, onClick }) => {
     return (
         <button type='button' onClick={onClick}>{buttonText}</button>
     );
-}
+};
+
+GraphQLButtonBase.propTypes = {
+    loading: PropTypes.bool.isRequired,
+    error: PropTypes.any,
+    data: PropTypes.any,
+    onClick: PropTypes.func.isRequired,
+};
+
+GraphQLButtonBase.defaultProps = {
+    error: null,
+    data: null,
+};
 
 const GraphQLButton = ({ options }) => {
-    const { loading, error, data, refetch } = useQuery(RANDOM_TEXT_QUERY, options);
+    const { loading, error, data, refetch } = useQuery(
+        RANDOM_TEXT_QUERY,
+        options,
+    );
 
     return (
         <GraphQLButtonBase
@@ -35,6 +51,14 @@ const GraphQLButton = ({ options }) => {
             onClick={refetch}
         />
     );
+};
+
+GraphQLButton.propTypes = {
+    options: PropTypes.any,
+};
+
+GraphQLButton.defaultProps = {
+    options: undefined,
 };
 
 const GraphQLButtonManual = ({ attr }) => {
@@ -47,7 +71,7 @@ const GraphQLButtonManual = ({ attr }) => {
                 attr,
                 seed: count,
             },
-        }
+        },
     );
 
     const buttonClick = () => {
@@ -65,12 +89,24 @@ const GraphQLButtonManual = ({ attr }) => {
     );
 };
 
-const GraphQLButtonChainElement = ({ chainIndex, chainSize, options, attr }) => {
+GraphQLButtonManual.propTypes = {
+    attr: PropTypes.string.isRequired,
+};
+
+const GraphQLButtonChainElement = ({
+    chainIndex,
+    chainSize,
+    options,
+    attr,
+}) => {
     if (chainIndex === chainSize) {
         return null;
     }
 
-    const { loading, error, data, refetch } = useQuery(RANDOM_TEXT_QUERY, options);
+    const { loading, error, data, refetch } = useQuery(
+        RANDOM_TEXT_QUERY,
+        options,
+    );
 
     return (
         <>
@@ -92,6 +128,18 @@ const GraphQLButtonChainElement = ({ chainIndex, chainSize, options, attr }) => 
     );
 };
 
+GraphQLButtonChainElement.propTypes = {
+    chainIndex: PropTypes.number.isRequired,
+    chainSize: PropTypes.number.isRequired,
+    options: PropTypes.any,
+    attr: PropTypes.string,
+};
+
+GraphQLButtonChainElement.defaultProps = {
+    options: undefined,
+    attr: undefined,
+};
+
 const GraphQLButtonChain = ({ chainSize, options, attr }) => (
     <GraphQLButtonChainElement
         chainIndex={0}
@@ -101,29 +149,61 @@ const GraphQLButtonChain = ({ chainSize, options, attr }) => (
     />
 );
 
+GraphQLButtonChain.propTypes = {
+    chainSize: PropTypes.number.isRequired,
+    options: PropTypes.any,
+    attr: PropTypes.string,
+};
+
+GraphQLButtonChain.defaultProps = {
+    options: undefined,
+    attr: undefined,
+};
+
 const GraphQLButtonsBlock = () => (
     <div>
         <h3>GraphQL Buttons Block</h3>
         <p>
-            SSR Button: <GraphQLButton options={{ variables: { attr: 'ssr' } }} />
+            SSR Button:
+            <GraphQLButton options={{ variables: { attr: 'ssr' } }} />
         </p>
         <p>
-            SSR Skip Button: <GraphQLButton options={{ variables: { attr: 'ssr_skip' }, ssr: false } } />
+            SSR Skip Button:
+            <GraphQLButton
+                options={{ variables: { attr: 'ssr_skip' }, ssr: false }}
+            />
         </p>
         <p>
-            Manual button: <GraphQLButtonManual options={{ variables: { attr: 'manual' } }} />
+            Manual button:
+            <GraphQLButtonManual options={{ variables: { attr: 'manual' } }} />
         </p>
         <p>
             Chain SSR (with cache):
-            <GraphQLButtonChain chainSize={5} options={{ variables: { attr: 'chain_ssr_cache' } }} />
+            <GraphQLButtonChain
+                chainSize={5}
+                options={{ variables: { attr: 'chain_ssr_cache' } }}
+            />
         </p>
         <p>
             Chain SSR skip (with cache):
-            <GraphQLButtonChain chainSize={5} options={{ variables: { attr: 'chain_ssr_skip_cache' }, ssr: false }} />
+            <GraphQLButtonChain
+                chainSize={5}
+                options={{
+                    variables: { attr: 'chain_ssr_skip_cache' },
+                    ssr: false,
+                }}
+            />
         </p>
         <p>
             Chain SSR skip (no cache):
-            <GraphQLButtonChain chainSize={5} options={{ variables: { attr: 'chain_ssr_skip_no_cache' }, skipCache: true, ssr: false }} />
+            <GraphQLButtonChain
+                chainSize={5}
+                options={{
+                    variables: { attr: 'chain_ssr_skip_no_cache' },
+                    skipCache: true,
+                    ssr: false,
+                }}
+            />
         </p>
     </div>
 );

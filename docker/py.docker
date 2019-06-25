@@ -1,5 +1,7 @@
 FROM python:3.7.3-alpine
 
+RUN apk add build-base
+
 RUN wget https://github.com/watchexec/watchexec/releases/download/1.10.1/watchexec-1.10.1-x86_64-unknown-linux-musl.tar.gz
 RUN tar -xvf watchexec-1.10.1-x86_64-unknown-linux-musl.tar.gz watchexec-1.10.1-x86_64-unknown-linux-musl
 RUN mv watchexec-1.10.1-x86_64-unknown-linux-musl/watchexec /usr/local/bin
@@ -9,5 +11,5 @@ WORKDIR /work
 
 ENV PYTHONUNBUFFERED 1
 
-COPY requirements.txt ./
-RUN pip install -r requirements.txt --no-deps
+COPY requirements/base.txt requirements/dev.txt ./requirements/
+RUN pip install -r requirements/dev.txt --no-deps

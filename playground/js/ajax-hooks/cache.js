@@ -1,8 +1,7 @@
 import LRU from 'lru-cache';
 
 class AjaxHooksCache {
-
-    constructor ({
+    constructor({
         ssrMode = false,
         initialState,
         size,
@@ -15,7 +14,7 @@ class AjaxHooksCache {
         this.ssrMode = ssrMode;
     }
 
-    set (hash, error, response) {
+    set(hash, error, response) {
         let cachedResponse = null;
         if (response) {
             const { data, status, statusText, headers } = response;
@@ -29,38 +28,39 @@ class AjaxHooksCache {
         });
     }
 
-    get (hash, onetime = false) {
+    get(hash, onetime = false) {
         const result = this.lru.get(hash);
 
         if (result) {
             if (onetime) {
                 if (this.ssrMode) {
-                    ++result.onetimeCount;
+                    result.onetimeCount += 1;
                     return result;
-                } else {
-                    if (result.onetimeCount) {
-                        --result.onetimeCount;
-                        return result;
-                    } else {
-                        return null;
-                    }
                 }
-            } else {
-                return result;
+
+                if (result.onetimeCount) {
+                    result.onetimeCount -= 1;
+                    return result;
+                }
+
+                return null;
             }
+
+            return result;
         }
+
+        return null;
     }
 
-    dump () {
+    dump() {
         return this.lru.dump();
     }
 
-    resetOneTimeCounts () {
-        this.lru.forEach((result) => {
+    resetOneTimeCounts() {
+        for (const result of this.lru.values()) {
             result.onetimeCount = 0;
-        });
+        }
     }
-
 }
 
 export default AjaxHooksCache;

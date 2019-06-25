@@ -4,7 +4,6 @@ import defaultAxios from 'axios';
 import AjaxHooksCache from './cache';
 
 class AjaxHooksClient {
-
     constructor(init = {}) {
         const { axios, ssrMode, initialState, cacheSize } = init;
 
@@ -13,7 +12,11 @@ class AjaxHooksClient {
         this.ssrMode = Boolean(ssrMode);
         this.ssrPromises = this.ssrMode ? {} : null;
 
-        this.cache = new AjaxHooksCache({ ssrMode, initialState, size: cacheSize});
+        this.cache = new AjaxHooksCache({
+            ssrMode,
+            initialState,
+            size: cacheSize,
+        });
     }
 
     async waitSSRRequests(App) {
@@ -31,7 +34,6 @@ class AjaxHooksClient {
     dumpCache() {
         return this.cache.dump();
     }
-
 }
 
 export default AjaxHooksClient;

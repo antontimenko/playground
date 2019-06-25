@@ -1,7 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import { GraphQLClient, ClientContext as GraphQLClientContext } from 'graphql-hooks';
+import {
+    GraphQLClient,
+    ClientContext as GraphQLClientContext,
+} from 'graphql-hooks';
 import graphQLMemCache from 'graphql-hooks-memcache';
 import { AjaxHooksClient, AjaxHooksProvider } from 'ajax-hooks';
 
@@ -13,7 +16,7 @@ const ajaxHooksClient = new AjaxHooksClient({
 
 const graphqlClient = new GraphQLClient({
     url: '/api/graphql',
-    cache: graphQLMemCache({ initialState: window.__GRAPHQL_INITIAL_STATE__ })
+    cache: graphQLMemCache({ initialState: window.__GRAPHQL_INITIAL_STATE__ }),
 });
 
 ReactDOM.hydrate(

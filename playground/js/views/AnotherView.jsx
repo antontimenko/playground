@@ -8,7 +8,7 @@ const AnotherView = () => (
             <title>Another View</title>
         </Helmet>
         <h1>Another View</h1>
-        <Link to="/">Index View</Link>
+        <Link to='/'>Index View</Link>
     </>
 );
 

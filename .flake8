@@ -1,0 +1,5 @@
+[flake8]
+max-line-length=80
+multiline-quotes = '''
+application-import-names=playground
+import-order-style=smarkets

@@ -1,15 +1,11 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import { useState, useEffect, useContext, useMemo } from 'react';
 import hash from 'object-hash';
 
 import AjaxHooksContext from './context';
 
-const useAjaxHooksClient = () => {
-    return useContext(AjaxHooksContext);
-}
+const useAjaxHooksClient = () => useContext(AjaxHooksContext);
 
-const getRequestHash = (axiosProps) => {
-    return hash(JSON.stringify(axiosProps));
-}
+const getRequestHash = axiosProps => hash(JSON.stringify(axiosProps));
 
 const performHttpRequest = async (axiosProps, ajaxHooksClient) => {
     try {
@@ -18,34 +14,21 @@ const performHttpRequest = async (axiosProps, ajaxHooksClient) => {
     } catch (error) {
         return { error, response: error.response || null };
     }
-}
+};
 
-const performRequest = async (
-    axiosProps,
-    { cacheRead, cacheWrite, cacheOnetime },
-    ajaxHooksClient,
-) => {
-    const requestHash = getRequestHash(axiosProps);
+const MANUAL_RESULT = {
+    loading: false,
+    error: null,
+    response: null,
+    fromCache: null,
+};
 
-    if (cacheRead) {
-        const cacheResult = ajaxHooksClient.cache.get(requestHash, cacheOnetime);
-        if (cacheResult) {
-            const { error, response } = cacheResult;
-            return { error, response, fromCache: true };
-        }
-    }
-
-    const { error, response } = await performHttpRequest(axiosProps, ajaxHooksClient);
-
-    if (cacheWrite) {
-        ajaxHooksClient.cache.set(requestHash, error, response);
-    }
-
-    return { error, response, fromCache: false };
-}
-
-const MANUAL_RESULT = { loading: false, error: null, response: null, fromCache: null };
-const LOADING_RESULT = { loading: true, error: null, response: null, fromCache: null };
+const LOADING_RESULT = {
+    loading: true,
+    error: null,
+    response: null,
+    fromCache: null,
+};
 
 const ajaxOnServer = (
     axiosProps,
@@ -67,14 +50,20 @@ const ajaxOnServer = (
     } else {
         const requestHash = getRequestHash(axiosProps);
 
-        const cacheResult = ajaxHooksClient.cache.get(requestHash, cacheOnetime);
+        const cacheResult = ajaxHooksClient.cache.get(
+            requestHash,
+            cacheOnetime,
+        );
         if (cacheResult) {
             const { error, response } = cacheResult;
             result = { error, response, fromCache: true };
         } else {
             if (!ajaxHooksClient.ssrPromises[requestHash]) {
                 const requestPromise = (async () => {
-                    const { error, response } = await performHttpRequest(axiosProps, ajaxHooksClient);
+                    const { error, response } = await performHttpRequest(
+                        axiosProps,
+                        ajaxHooksClient,
+                    );
                     ajaxHooksClient.cache.set(requestHash, error, response);
                 })();
 
@@ -88,51 +77,68 @@ const ajaxOnServer = (
     return {
         execute: () => () => null,
         ...result,
+    };
+};
+
+const getExecuteFunc = (
+    baseAxiosProps,
+    baseOptions,
+    ajaxHooksClient,
+    setResult,
+) => ({
+    axiosProps: executeAxiosProps = {},
+    options: executeOptions = {},
+} = {}) => {
+    if (typeof baseAxiosProps === 'string') {
+        baseAxiosProps = { url: baseAxiosProps };
     }
-}
 
-const getExecuteFunc = (baseAxiosProps, baseOptions, ajaxHooksClient, setResult) => {
-    return ({ axiosProps: executeAxiosProps = {}, options: executeOptions = {} } = {}) => {
-        if (typeof(baseAxiosProps) === 'string') {
-            baseAxiosProps = { url: baseAxiosProps };
-        }
-
-        if (typeof(executeAxiosProps) === 'string') {
-            executeAxiosProps = { url: executeAxiosProps };
-        }
-
-        if (executeOptions.cacheRead === undefined) {
-            executeOptions.cacheRead = false;
-        }
-
-        const axiosProps = {...baseAxiosProps, ...executeAxiosProps};
-        const options = { ...baseOptions, ...executeOptions };
-
-        const requestHash = getRequestHash(axiosProps);
-        const { cacheRead, cacheWrite, cacheOnetime } = options;
-
-        return async () => {
-            if (cacheRead) {
-                const cacheResult = ajaxHooksClient.cache.get(requestHash, cacheOnetime);
-                if (cacheResult) {
-                    const { error, response } = cacheResult;
-                    setResult({ loading: false, error, response, fromCache: true });
-                    return;
-                }
-            }
-
-            setResult(LOADING_RESULT);
-
-            const { error, response } = await performHttpRequest(axiosProps, ajaxHooksClient);
-
-            if (cacheWrite) {
-                ajaxHooksClient.cache.set(requestHash, error, response);
-            }
-
-            setResult({ loading: false, error, response, fromCache: false })
-        }
+    if (typeof executeAxiosProps === 'string') {
+        executeAxiosProps = { url: executeAxiosProps };
     }
-}
+
+    if (executeOptions.cacheRead === undefined) {
+        executeOptions.cacheRead = false;
+    }
+
+    const axiosProps = { ...baseAxiosProps, ...executeAxiosProps };
+    const options = { ...baseOptions, ...executeOptions };
+
+    const requestHash = getRequestHash(axiosProps);
+    const { cacheRead, cacheWrite, cacheOnetime } = options;
+
+    return async () => {
+        if (cacheRead) {
+            const cacheResult = ajaxHooksClient.cache.get(
+                requestHash,
+                cacheOnetime,
+            );
+            if (cacheResult) {
+                const { error, response } = cacheResult;
+                setResult({
+                    loading: false,
+                    error,
+                    response,
+                    fromCache: true,
+                });
+                return;
+            }
+        }
+
+        setResult(LOADING_RESULT);
+
+        const { error, response } = await performHttpRequest(
+            axiosProps,
+            ajaxHooksClient,
+        );
+
+        if (cacheWrite) {
+            ajaxHooksClient.cache.set(requestHash, error, response);
+        }
+
+        setResult({ loading: false, error, response, fromCache: false });
+    };
+};
 
 const ajaxOnClient = (
     axiosProps,
@@ -150,17 +156,21 @@ const ajaxOnClient = (
     const initResult = useMemo(() => {
         if (manual) {
             return MANUAL_RESULT;
-        } else if (!cacheRead) {
-            return LOADING_RESULT;
-        } else {
-            const cacheResult = ajaxHooksClient.cache.get(requestHash, cacheOnetime);
-            if (cacheResult) {
-                const { error, response } = cacheResult;
-                return { loading: false, error, response, fromCache: true };
-            } else {
-                return LOADING_RESULT;
-            }
         }
+        if (!cacheRead) {
+            return LOADING_RESULT;
+        }
+
+        const cacheResult = ajaxHooksClient.cache.get(
+            requestHash,
+            cacheOnetime,
+        );
+        if (cacheResult) {
+            const { error, response } = cacheResult;
+            return { loading: false, error, response, fromCache: true };
+        }
+
+        return LOADING_RESULT;
     }, [requestHash]);
 
     const [result, setResult] = useState(initResult);
@@ -168,13 +178,21 @@ const ajaxOnClient = (
     useEffect(() => {
         (async () => {
             if (!(manual || initResult.fromCache)) {
-                const { error, response } = await performHttpRequest(axiosProps, ajaxHooksClient);
+                const { error, response } = await performHttpRequest(
+                    axiosProps,
+                    ajaxHooksClient,
+                );
 
                 if (cacheWrite) {
                     ajaxHooksClient.cache.set(requestHash, error, response);
                 }
 
-                setResult({ loading: false, error, response, fromCache: false });
+                setResult({
+                    loading: false,
+                    error,
+                    response,
+                    fromCache: false,
+                });
             }
         })();
     }, [
@@ -188,10 +206,15 @@ const ajaxOnClient = (
     ]);
 
     return {
-        execute: getExecuteFunc(axiosProps, { cacheRead, cacheWrite, cacheOnetime }, ajaxHooksClient, setResult),
+        execute: getExecuteFunc(
+            axiosProps,
+            { cacheRead, cacheWrite, cacheOnetime },
+            ajaxHooksClient,
+            setResult,
+        ),
         ...result,
     };
-}
+};
 
 export const useAjax = (axiosProps, options = {}) => {
     const ajaxHooksClient = useAjaxHooksClient();
@@ -201,4 +224,4 @@ export const useAjax = (axiosProps, options = {}) => {
     }
 
     return ajaxOnClient(axiosProps, options, ajaxHooksClient);
-}
+};

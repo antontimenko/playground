@@ -3,17 +3,20 @@
 This is a sample project, which can be used as a starting point to create web applications using this stack of technologies:
 
 - Python
- - [aiohttp](https://github.com/aio-libs/aiohttp) as an api backend
- - [graphene](https://github.com/graphql-python/graphene) to build GraphQL API
- - [aiohttp-graphql](https://github.com/graphql-python/aiohttp-graphql) to use graphene in aiohttp
+  - [aiohttp](https://github.com/aio-libs/aiohttp) as an api backend
+  - [graphene](https://github.com/graphql-python/graphene) to build GraphQL API
+  - [aiohttp-graphql](https://github.com/graphql-python/aiohttp-graphql) to use graphene in aiohttp
+  - [mypy](https://github.com/python/mypy) for static type checking
+  - [flake8](https://github.com/pycqa/flake8/) for linting
 - Javascript
- - [webpack](https://github.com/webpack/webpack) to bundle frontend code
- - [express](https://github.com/expressjs/expressjs.com) as a SSR backend
- - [react](https://github.com/facebook/react/) to build user interfaces
- - [react-router](https://github.com/ReactTraining/react-router) to setup routing
- - [react-helmet](https://github.com/nfl/react-helmet) to manage SEO things using SSR
- - [graphql-hooks](https://github.com/nearform/graphql-hooks) as a GraphQL JS client
- - [ajax-hooks]() as a simple HTTP JS client
+  - [webpack](https://github.com/webpack/webpack) to bundle frontend code
+  - [express](https://github.com/expressjs/expressjs.com) as a SSR backend
+  - [react](https://github.com/facebook/react/) to build user interfaces
+  - [react-router](https://github.com/ReactTraining/react-router) to setup routing
+  - [react-helmet](https://github.com/nfl/react-helmet) to manage SEO things using SSR
+  - [graphql-hooks](https://github.com/nearform/graphql-hooks) as a GraphQL JS client
+  - [ajax-hooks]() as a simple HTTP JS client
+  - [eslint](https://github.com/eslint/eslint) for linting
 - [nginx](https://github.com/nginx/nginx) as a reverse proxy to API and SSR backends
 - Docker and docker-compose to setup development environment
 - Makefile to make long docker-compose commands easier to use
@@ -42,12 +45,29 @@ After resulting page loads in browser, the frontend part comes in
 
 There is also a Nginx server, which is working at main port `8000`. It is needed to just proxy all the requests to SSR server, except ones to `/api/*` urls, which are proxied to Python API, so we can work with both servers on the same domain and port and do not care about Cross Origin Policies
 
-If you want to add some JS package to project, simply do:
+## Linting
 
-`docker-compose run --rm yarn add <package>`
+You can run `mypy`, `flake8` and `eslint` using
+```
+make mypy
+make flake8
+make eslint
+```
+or simply
+```
+make lint
+```
+
+## Customizing
+
+If you want to add some JS package to project, simply do:
+```
+docker-compose run --rm yarn add <package>
+```
 
 If you want to add some Python package to project, simply put package and dependencies to `requirements.txt`. You can use
-
-`docker-compose run --rm pip install <package>`
+```
+docker-compose run --rm pip install <package>
+```
 
 to see what dependencies you need to add

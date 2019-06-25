@@ -12,11 +12,11 @@ const IndexView = () => (
             <title>Index View</title>
         </Helmet>
         <h1>Index View</h1>
-        <Link to="/another">Another View</Link>
+        <Link to='/another'>Another View</Link>
         <br />
-        <Link to="/redirect">Redirect View</Link>
+        <Link to='/redirect'>Redirect View</Link>
         <br />
-        <Link to="/404">404 View</Link>
+        <Link to='/404'>404 View</Link>
         <br />
         <GraphQLButtonsBlock />
         <br />

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useQuery } from 'graphql-hooks';
 import { useAjax } from 'ajax-hooks';
 
@@ -16,8 +17,22 @@ const ButtonBase = ({ prefix, loading, error, data, getText, onClick }) => {
 
     return (
         <button type='button' onClick={onClick}>{buttonText}</button>
-    )
-}
+    );
+};
+
+ButtonBase.propTypes = {
+    prefix: PropTypes.string.isRequired,
+    loading: PropTypes.bool.isRequired,
+    error: PropTypes.any,
+    data: PropTypes.any,
+    getText: PropTypes.func.isRequired,
+    onClick: PropTypes.func.isRequired,
+};
+
+ButtonBase.defaultProps = {
+    error: null,
+    data: null,
+};
 
 const RANDOM_TEXT_QUERY = `
     query {
@@ -25,19 +40,25 @@ const RANDOM_TEXT_QUERY = `
     }
 `;
 
-const GraphQLButtonChainElement = ({ chainIndex, chainSize, withCache, getAttr, ...otherProps }) => {
+const GraphQLButtonChainElement = ({
+    chainIndex,
+    chainSize,
+    withCache,
+    getAttr,
+    ...otherProps
+}) => {
     const { loading, error, data, refetch } = useQuery(RANDOM_TEXT_QUERY, {
         skipCache: !withCache,
         ssr: withCache,
         variables: {
             button: getAttr(chainIndex),
-        }
+        },
     });
 
     return (
         <>
             <ButtonBase
-                prefix={'GraphQL'}
+                prefix='GraphQL'
                 loading={loading}
                 error={error}
                 data={data}
@@ -55,9 +76,22 @@ const GraphQLButtonChainElement = ({ chainIndex, chainSize, withCache, getAttr, 
             ) : null}
         </>
     );
-}
+};
 
-const AjaxButtonChainElement = ({ chainIndex, chainSize, withCache, getAttr, ...otherProps }) => {
+GraphQLButtonChainElement.propTypes = {
+    chainIndex: PropTypes.number.isRequired,
+    chainSize: PropTypes.number.isRequired,
+    withCache: PropTypes.bool.isRequired,
+    getAttr: PropTypes.func.isRequired,
+};
+
+const AjaxButtonChainElement = ({
+    chainIndex,
+    chainSize,
+    withCache,
+    getAttr,
+    ...otherProps
+}) => {
     const { loading, error, response, execute } = useAjax({
         url: '/api/random-text',
         params: { button: getAttr(chainIndex) },
@@ -68,7 +102,7 @@ const AjaxButtonChainElement = ({ chainIndex, chainSize, withCache, getAttr, ...
     return (
         <>
             <ButtonBase
-                prefix={'Ajax'}
+                prefix='Ajax'
                 loading={loading}
                 error={error}
                 data={response}
@@ -86,11 +120,14 @@ const AjaxButtonChainElement = ({ chainIndex, chainSize, withCache, getAttr, ...
             ) : null}
         </>
     );
+};
 
-    return (
-        <button type='button'>AJAX</button>
-    );
-}
+AjaxButtonChainElement.propTypes = {
+    chainIndex: PropTypes.number.isRequired,
+    chainSize: PropTypes.number.isRequired,
+    withCache: PropTypes.bool.isRequired,
+    getAttr: PropTypes.func.isRequired,
+};
 
 const MixedButtonChainElement = ({ chainIndex, chainSize, ...otherProps }) => {
     if (chainIndex === chainSize) {
@@ -114,7 +151,12 @@ const MixedButtonChainElement = ({ chainIndex, chainSize, ...otherProps }) => {
             )}
         </>
     );
-}
+};
+
+MixedButtonChainElement.propTypes = {
+    chainIndex: PropTypes.number.isRequired,
+    chainSize: PropTypes.number.isRequired,
+};
 
 const MixedButtonChain = ({ chainSize, ...otherProps }) => (
     <MixedButtonChainElement
@@ -124,20 +166,36 @@ const MixedButtonChain = ({ chainSize, ...otherProps }) => (
     />
 );
 
+MixedButtonChain.propTypes = {
+    chainSize: PropTypes.number.isRequired,
+};
+
 const MixedButtonsBlock = () => (
     <div>
         <h3>Mixed buttons block</h3>
         <p>
             Mixed Depend Chain (with cache):
-            <MixedButtonChain chainSize={10} withCache={true} getAttr={index => 'mixed_chain_cache'} />
+            <MixedButtonChain
+                chainSize={10}
+                withCache
+                getAttr={() => 'mixed_chain_cache'}
+            />
         </p>
         <p>
             Mixed Depend Chain Variable (with cache):
-            <MixedButtonChain chainSize={10} withCache={true} getAttr={index => `mixed_chain_cache_${index}`} />
+            <MixedButtonChain
+                chainSize={10}
+                withCache
+                getAttr={index => `mixed_chain_cache_${index}`}
+            />
         </p>
         <p>
             Mixed Depend Chain (without cache):
-            <MixedButtonChain chainSize={10} withCache={false} getAttr={index => 'mixed_chain_no_cache'} />
+            <MixedButtonChain
+                chainSize={10}
+                withCache={false}
+                getAttr={() => 'mixed_chain_no_cache'}
+            />
         </p>
     </div>
 );

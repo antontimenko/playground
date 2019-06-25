@@ -5,7 +5,7 @@ from playground.views import index
 from playground.views import random_text
 
 
-def setup_routes(app):
+def setup_routes(app: web.Application) -> None:
     app.add_routes((
         web.get('/api', index),
         web.view('/api/graphql', graphql_view, name='graphql'),

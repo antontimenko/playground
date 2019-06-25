@@ -2,7 +2,10 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { Helmet } from 'react-helmet';
 import { StaticRouter } from 'react-router-dom';
-import { GraphQLClient, ClientContext as GraphQLClientContext } from 'graphql-hooks';
+import {
+    GraphQLClient,
+    ClientContext as GraphQLClientContext,
+} from 'graphql-hooks';
 import graphQLMemCache from 'graphql-hooks-memcache';
 import { getInitialState as getGraphQLInitialState } from 'graphql-hooks-ssr';
 import fetch from 'node-fetch';
@@ -12,6 +15,26 @@ import express from 'express';
 import { AjaxHooksClient, AjaxHooksProvider } from 'ajax-hooks';
 
 import App from 'components/App';
+
+const HTML = (root, helmet, graphQLState, ajaxHooksState) => (
+    `<!DOCTYPE html>
+<html ${helmet.htmlAttributes.toString()}>
+    <head>
+        ${helmet.title.toString()}
+        ${helmet.meta.toString()}
+        ${helmet.link.toString()}
+    </head>
+    <body ${helmet.bodyAttributes.toString()}>
+        <div id="root">${root}</div>
+
+        <script type="text/javascript">
+            window.__GRAPHQL_INITIAL_STATE__ = ${JSON.stringify(graphQLState)};
+            window.__AJAX_HOOKS_INITIAL_STATE__ = ${JSON.stringify(ajaxHooksState)};
+        </script>
+        <script type="text/javascript" src="http://localhost:8001/main.js"></script>
+    </body>
+</html>`
+);
 
 const app = express();
 
@@ -53,7 +76,9 @@ app.get('*', async (req, res) => {
             client: graphqlClient,
         });
 
-        const ajaxRequestsCount = await ajaxHooksClient.waitSSRRequests(Application);
+        const ajaxRequestsCount = await ajaxHooksClient.waitSSRRequests(
+            Application,
+        );
 
         if (staticContext.url) {
             res.redirect(staticContext.url);
@@ -71,33 +96,15 @@ app.get('*', async (req, res) => {
 
     const helmet = Helmet.renderStatic();
 
-    const pageStatus = staticContext.pageStatus ? staticContext.pageStatus : 200;
+    const pageStatus = staticContext.pageStatus
+        ? staticContext.pageStatus
+        : 200;
 
     res.status(pageStatus).send(
-        HTML(rootHTML, helmet, graphQLState, ajaxHooksClient.dumpCache())
+        HTML(rootHTML, helmet, graphQLState, ajaxHooksClient.dumpCache()),
     );
 });
 
 app.listen(8003, () => {
-    console.log('SSR server listening on port 8003!');
+    console.log('SSR server listening on port 8003!'); // eslint-disable-line no-console
 });
-
-const HTML = (root, helmet, graphQLState, ajaxHooksState) => (
-    `<!DOCTYPE html>
-<html ${helmet.htmlAttributes.toString()}>
-    <head>
-        ${helmet.title.toString()}
-        ${helmet.meta.toString()}
-        ${helmet.link.toString()}
-    </head>
-    <body ${helmet.bodyAttributes.toString()}>
-        <div id="root">${root}</div>
-
-        <script type="text/javascript">
-            window.__GRAPHQL_INITIAL_STATE__ = ${JSON.stringify(graphQLState)};
-            window.__AJAX_HOOKS_INITIAL_STATE__ = ${JSON.stringify(ajaxHooksState)};
-        </script>
-        <script type="text/javascript" src="http://localhost:8001/main.js"></script>
-    </body>
-</html>`
-);

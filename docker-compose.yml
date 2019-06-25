@@ -42,9 +42,21 @@ services:
     <<: *py-base
     entrypoint: ['pip']
 
+  flake8:
+    <<: *py-base
+    entrypoint: ['flake8']
+
+  mypy:
+    <<: *py-base
+    entrypoint: ['mypy', '.']
+
   yarn:
     <<: *js-base
     entrypoint: ['yarn']
+
+  eslint:
+    <<: *js-base
+    command: yarn eslint
 
 volumes:
   node_modules:
