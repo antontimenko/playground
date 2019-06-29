@@ -22,7 +22,7 @@ const AjaxButtonSSR = () => {
     const { loading, error, response, execute } = useAjax('/api/random-text');
 
     return (
-        <button type='button' onClick={execute()}>
+        <button type='button' onClick={execute}>
             {getButtonText({ loading, error, response })}
         </button>
     );
@@ -37,7 +37,7 @@ const AjaxButtonSkipSSR = () => {
     });
 
     return (
-        <button type='button' onClick={execute()}>
+        <button type='button' onClick={execute}>
             {getButtonText({ loading, error, response })}
         </button>
     );
@@ -52,7 +52,7 @@ const AjaxButtonManual = () => {
     });
 
     return (
-        <button type='button' onClick={execute()}>
+        <button type='button' onClick={execute}>
             {getButtonText({ loading, error, response })}
         </button>
     );
@@ -69,7 +69,7 @@ const AjaxButtonManualCache = () => {
     return (
         <button
             type='button'
-            onClick={execute({ options: { cacheRead: true } })}
+            onClick={() => execute({ options: { cacheRead: true } })}
         >
             {getButtonText({ loading, error, response })}
         </button>
@@ -93,7 +93,7 @@ const AjaxButtonChainElement = ({
 
     return (
         <>
-            <button type='button' onClick={execute()}>
+            <button type='button' onClick={execute}>
                 {getButtonText({ loading, error, response })}
             </button>
             {(!loading) && (!error) && response ? (

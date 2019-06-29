@@ -108,7 +108,7 @@ const AjaxButtonChainElement = ({
                 error={error}
                 data={response}
                 getText={response => response.data.text}
-                onClick={execute()}
+                onClick={execute}
             />
             {(!loading) && (!error) && response ? (
                 <MixedButtonChainElement
