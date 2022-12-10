@@ -6,7 +6,7 @@
     "dependencies": {
         "axios": "^0.19.0",
         "babel-loader": "^8.0.6",
-        "express": "^4.17.1",
+        "express": "^4.17.3",
         "graphql-hooks": "^3.5.1",
         "graphql-hooks-memcache": "^1.2.0",
         "graphql-hooks-ssr": "^1.1.2",
